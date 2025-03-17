@@ -112,6 +112,39 @@ func getConfig() (*TStatZoneConfig, bool) {
 	}, true
 }
 
+func getConfig2() (*TStatZoneConfig, bool) {
+	cfg := TStatZoneParams{}
+	ok := infinity.ReadTable(devTSTAT, &cfg)
+	if !ok {
+		return nil, false
+	}
+
+	params := TStatCurrentParams{}
+	ok = infinity.ReadTable(devTSTAT, &params)
+	if !ok {
+		return nil, false
+	}
+
+	hold := new(bool)
+	*hold = cfg.ZoneHold&0x01 == 1
+
+	return &TStatZoneConfig{
+		TempUnit:        infinity.tempUnitStr(),
+		CurrentTemp:     params.Z2CurrentTemp,
+		CurrentHumidity: params.Z2CurrentHumidity,
+		OutdoorTemp:     params.OutdoorAirTemp,
+		Mode:            rawModeToString(params.Mode & 0xf),
+		Stage:           params.Mode >> 5,
+		FanMode:         rawFanModeToString(cfg.Z2FanMode),
+		Hold:            hold,
+		HoldDuration:    cfg.Z2HoldDuration,
+		HeatSetpoint:    cfg.Z2HeatSetpoint,
+		CoolSetpoint:    cfg.Z2CoolSetpoint,
+		TargetHum:       cfg.Z2TargetHumidity,
+		RawMode:         params.Mode,
+	}, true
+}
+
 func getDeviceInfo(address uint16) (*DeviceInfo, bool) {
 	params := DevInfoParams{}
 	ok := infinity.ReadTable(address, &params)
