@@ -145,6 +145,72 @@ func getConfig2() (*TStatZoneConfig, bool) {
 	}, true
 }
 
+func getConfig3() (*TStatZoneConfig, bool) {
+	cfg := TStatZoneParams{}
+	ok := infinity.ReadTable(devTSTAT, &cfg)
+	if !ok {
+		return nil, false
+	}
+
+	params := TStatCurrentParams{}
+	ok = infinity.ReadTable(devTSTAT, &params)
+	if !ok {
+		return nil, false
+	}
+
+	hold := new(bool)
+	*hold = cfg.ZoneHold&0x01 == 1
+
+	return &TStatZoneConfig{
+		TempUnit:        infinity.tempUnitStr(),
+		CurrentTemp:     params.Z3CurrentTemp,
+		CurrentHumidity: params.Z3CurrentHumidity,
+		OutdoorTemp:     params.OutdoorAirTemp,
+		Mode:            rawModeToString(params.Mode & 0xf),
+		Stage:           params.Mode >> 5,
+		FanMode:         rawFanModeToString(cfg.Z3FanMode),
+		Hold:            hold,
+		HoldDuration:    cfg.Z3HoldDuration,
+		HeatSetpoint:    cfg.Z3HeatSetpoint,
+		CoolSetpoint:    cfg.Z3CoolSetpoint,
+		TargetHum:       cfg.Z3TargetHumidity,
+		RawMode:         params.Mode,
+	}, true
+}
+
+func getConfig4() (*TStatZoneConfig, bool) {
+	cfg := TStatZoneParams{}
+	ok := infinity.ReadTable(devTSTAT, &cfg)
+	if !ok {
+		return nil, false
+	}
+
+	params := TStatCurrentParams{}
+	ok = infinity.ReadTable(devTSTAT, &params)
+	if !ok {
+		return nil, false
+	}
+
+	hold := new(bool)
+	*hold = cfg.ZoneHold&0x01 == 1
+
+	return &TStatZoneConfig{
+		TempUnit:        infinity.tempUnitStr(),
+		CurrentTemp:     params.Z4CurrentTemp,
+		CurrentHumidity: params.Z4CurrentHumidity,
+		OutdoorTemp:     params.OutdoorAirTemp,
+		Mode:            rawModeToString(params.Mode & 0xf),
+		Stage:           params.Mode >> 5,
+		FanMode:         rawFanModeToString(cfg.Z4FanMode),
+		Hold:            hold,
+		HoldDuration:    cfg.Z4HoldDuration,
+		HeatSetpoint:    cfg.Z4HeatSetpoint,
+		CoolSetpoint:    cfg.Z4CoolSetpoint,
+		TargetHum:       cfg.Z4TargetHumidity,
+		RawMode:         params.Mode,
+	}, true
+}
+
 func getDeviceInfo(address uint16) (*DeviceInfo, bool) {
 	params := DevInfoParams{}
 	ok := infinity.ReadTable(address, &params)
